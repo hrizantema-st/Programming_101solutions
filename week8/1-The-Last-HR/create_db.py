@@ -4,13 +4,19 @@ import requests
 from settings import DB_NAME
 from settings import SQL_FILE
 
+
 conn = sqlite3.connect(DB_NAME)
 with open(SQL_FILE, "r") as f:
     conn.executescript(f.read())
     conn.commit()
 
-req = requests.get('https://hackbulgaria.com/api/students/')
-json_req = json.loads(req.text)
+with open("students.json", "r") as f2:
+    text = f2.read()
+    json_req = json.loads(text)
+
+
+#req = requests.get('https://hackbulgaria.com/api/students/')
+#json_req = req.json()
 
 
 def insertin_the_info_in_db(connection):
@@ -18,28 +24,26 @@ def insertin_the_info_in_db(connection):
     courses_list = []
     for each in json_req:
 
+        cursor.execute("""INSERT INTO Students(name, github, available)
+            VALUES (?, ?, ?)""", (each["name"], each["github"], each["available"]))
+        current_student_id = cursor.lastrowid
+
         for course in each["courses"]:
             if course["name"] not in courses_list:
+                courses_list.append(course["name"])
                 cursor.execute(
                     """INSERT INTO Courses(name) VALUES (?)""", (course["name"],))
-                courses_list.append(course["name"])
+                current_course_id = cursor.lastrowid
+            else:
+                cursor.execute(
+                    """SELECT id FROM Courses WHERE name=?""", (course["name"],))
+                tmp = cursor.fetchone()
+                current_course_id = tmp[0]
 
-            cursor.execute("""INSERT INTO Students(name, github, available, course, course_group)
-                VALUES (?, ?, ?, ?, ?)""", (each["name"], each["github"], each["available"], course["name"], course["group"]))
+            cursor.execute("""INSERT INTO Students_to_courses(student_id, course_id) VALUES (?, ?)""", (current_student_id, current_course_id))
+
+
 
 insertin_the_info_in_db(conn)
 conn.commit()
-
-def insert_info_in_junc(connection):
-    cursor = connection.cursor()
-    tmp = cursor.execute("""SELECT id, course FROM Students""")
-    students_id_and_course = tmp.fetchall()
-    for st in students_id_and_course:
-        a = cursor.execute("""SELECT id FROM Courses WHERE name = st[1] """)
-        cur_course_id = a.fetchone()
-        cursor.execute("""INSERT INTO Students_to_courses(student_id, course_id) VALUES (?, ?)""" ,
-                       (st[0], cur_course_id[0]))
-
-
-insert_info_in_junc(conn)
 conn.close()

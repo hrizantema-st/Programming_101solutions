@@ -2,8 +2,8 @@ DROP TABLE IF EXISTS Students;
 CREATE TABLE Students(id INTEGER PRIMARY KEY,
                       name TEXT,
                       github TEXT,
-                      available INTEGER
-                      );
+                      available INTEGER,
+                      course TEXT);
 
 DROP TABLE IF EXISTS Courses;
 CREATE TABLE Courses(id INTEGER PRIMARY KEY,

@@ -1,0 +1,12 @@
+SQLAlchemy
+DataMapper -> chisti python klasove
+           -> nqkoi drug pgi mapva kym sql
+
+
+-- class deklarativna baza
+imena i tipove
+
+
+-- engine - vryzva bazata i syzdava tablicite
+
+-- session - vzima instancii i se griji za tqh
