@@ -27,7 +27,7 @@ while True:
     elif command == "list_all_students_with_courses":
         info = cursor.execute("""SELECT a.name, b.name
                                  FROM  Students AS a
-                                 JOIN Students_to_courses AS c ON c.course_id=a.id
+                                 JOIN Students_to_courses AS c ON c.student_id=a.id
                                  JOIN Courses AS b ON b.id=c.course_id""")
         info_to_print = info.fetchall()
         for each in info_to_print:
